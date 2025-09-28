@@ -8,27 +8,27 @@ use Amplify\Widget\Abstracts\BaseComponent;
 
 class WishlistButton extends BaseComponent
 {
-    public function __construct(public Product|ItemRow $product, public string $variant = 'primary')
+    public function __construct(public Product|ItemRow $product)
     {
         parent::__construct();
     }
 
     public function render()
     {
-        $contact = customer(true);
+        $product_id = $this->product instanceof ItemRow ? $this->product->Amplify_Id : $this->product->id;
 
-        $contact_id = $contact->id;
-
-        $customer_id = $contact->customer_id;
-
-//        $product_id = $this->product instanceof ItemRow ? $this->product->Amplify_Id : $this->product->id;
-        $product_id = null;
-
-        return view('wishlist::wishlist-button', compact('contact_id', 'customer_id', 'product_id'));
+        return view('wishlist::wishlist-button', compact( 'product_id'));
     }
 
     public function hasPermission()
     {
         return true;
+    }
+
+    public function htmlAttributes(): string
+    {
+        $this->attributes = $this->attributes->class(['btn']);
+
+        return parent::htmlAttributes();
     }
 }
