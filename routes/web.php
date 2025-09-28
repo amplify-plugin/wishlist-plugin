@@ -19,13 +19,13 @@ Route::name('frontend.wishlist.')->middleware(['web', ProtectAgainstSpam::class,
     Route::get('wishlist', [WishlistController::class, 'index'])->name('index');
     Route::post('wishlist', [WishlistController::class, 'add'])->name('store');
 
-    Route::delete('wishlist/{wishlist}', [WishlistController::class, 'remove'])
+    Route::delete('wishlist/{product_id}', [WishlistController::class, 'remove'])
         ->name('destroy')
-        ->where(['wishlist' => '[0-9]+']);
+        ->where(['product_id' => '[0-9]+']);
 
-    Route::put('wishlist/{wishlist}', [WishlistController::class, 'update'])
+    Route::put('wishlist/{product_id}', [WishlistController::class, 'update'])
         ->name('update')
-        ->where(['wishlist' => '[0-9]+']);
+        ->where(['product_id' => '[0-9]+']);
 
     Route::get('wishlist/check/{product_id?}', [WishlistController::class, 'check'])->name('check');
 

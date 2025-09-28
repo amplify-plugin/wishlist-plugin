@@ -70,11 +70,22 @@ class WishlistController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function remove(Wishlist $wishlist): JsonResponse
+    public function remove($product_id): JsonResponse
     {
         try {
 
-            $wishlist->deleteOrFail();
+            $contact = customer(true);
+
+            /**
+             * @var $wishlist Wishlist
+             */
+            $wishlist = Wishlist::where([
+                'customer_id' => $contact->customer_id,
+                'contact_id' => $contact->id,
+                'product_id' => $product_id
+            ])->first();
+
+            $wishlist->deleteQuietly();
 
             return response()->json([
                 'status' => true,
