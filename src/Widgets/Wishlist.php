@@ -5,6 +5,7 @@ namespace Amplify\Wishlist\Widgets;
 use Amplify\ErpApi\Facades\ErpApi;
 use Amplify\System\Backend\Models\Product;
 use Amplify\Widget\Abstracts\BaseComponent;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 
 class Wishlist extends BaseComponent
@@ -13,14 +14,16 @@ class Wishlist extends BaseComponent
     {
         $contact = customer(true);
 
+        /**
+         * @var $wishlist LengthAwarePaginator
+         */
         $wishlist = \Amplify\Wishlist\Models\Wishlist::where('customer_id', $contact->customer_id)
             ->where('contact_id', $contact->id)
-            ->paginate(5);
+            ->paginate(request('per_page', getPaginationLengths()[0]));
 
-        $products = Product::with('attributes')->whereIn('id', array_unique($wishlist->pluck('product_id')->toArray()))->get();
+        $products = Product::whereIn('id', array_unique($wishlist->pluck('product_id')->toArray()))->get();
 
         $codes = [];
-        $products->each(fn($item) => $codes[] = ['item' => $item->product_code, 'uom' => $item->uom]);
 
         foreach ($products as $product) {
             $codes[] = [
@@ -34,24 +37,33 @@ class Wishlist extends BaseComponent
         $warehouseString = $warehouses->pluck('WarehouseNumber')->implode(',');
 
         $erpCustomer = ErpApi::getCustomerDetail();
+
         if (!Str::contains($warehouseString, $erpCustomer->DefaultWarehouse)) {
             $warehouseString = "$warehouseString,{$erpCustomer->DefaultWarehouse}";
         }
+
         $priceAndAvail = ErpApi::getProductPriceAvailability([
             'items' => $codes,
             'warehouse' => $warehouseString
         ]);
 
-        $wishlist->map(function ($item) use ($priceAndAvail) {
-            $product = $item->product;
-            $product->remove_from_cart = $item->remove_from_cart;
-            $product->last_notified_at = $item->last_notified_at;
+        $warehouse_codes = array_unique([$erpCustomer->DefaultWarehouse, customer()?->warehouse?->code, config('amplify.frontend.guest_checkout_warehouse')]);
+
+        $products = $products->map(function ($product) use ($priceAndAvail, $warehouse_codes) {
+            $filteredPriceAvailability = $priceAndAvail
+                ->where('ItemNumber', $product->product_code)
+                ->whereIn('WarehouseID', $warehouse_codes);
+
+            $product->ERP = $filteredPriceAvailability->isNotEmpty()
+                ? $filteredPriceAvailability->first()
+                : $priceAndAvail->where('ItemNumber', $product->product_code)
+                    ->first();
+
             $product->total_quantity_available = $priceAndAvail->where('ItemNumber', $product->productCode)->sum('QuantityAvailable');
+
             return $product;
         });
 
-//        dd($wishlist);
-
-        return view('wishlist::customer.wishlist', compact('wishlist'));
+        return view('wishlist::customer.wishlist', compact('products', 'wishlist'));
     }
 }
