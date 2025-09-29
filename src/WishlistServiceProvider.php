@@ -50,11 +50,11 @@ class WishlistServiceProvider extends ServiceProvider
                 'reserved' => true,
                 'url' => [
                     'type' => 'route',
-                    'name' => 'frontend.wishlists.index',
+                    'name' => 'frontend.wishlist.index',
                     'params' => '',
                 ],
             ];
-            
+
             Config::set('amplify.cms.page_types', $types);
         });
     }
