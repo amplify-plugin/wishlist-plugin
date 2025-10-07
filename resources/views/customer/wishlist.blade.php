@@ -34,18 +34,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse($products as $product)
-                                                {{-- @php
-                                                    dd($products);
-                                                @endphp --}}
+                                            @forelse($products as $key => $product)
                                                 <tr>
                                                     <td>
-                                                        <div class="d-flex justify-content-start align-content-center">
-                                                            <div>
-                                                                <img class="rounded-top aspect-square object-contain"
-                                                                    src="{{ $product->Product_Image ?? '' }}"
-                                                                    alt="Product">
-                                                            </div>
+                                                        <div
+                                                            class="d-flex justify-content-start align-content-center gap-2">
+                                                            <img class="rounded-top aspect-square object-contain"
+                                                                style="width: 15%"
+                                                                src="{{ $product->productImage->main ?? '' }}"
+                                                                alt="Product">
                                                             <div>
                                                                 <div class="d-flex gap-2">
                                                                     {{ $product->product_name }}
@@ -55,33 +52,40 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="align-items-center d-flex product-count gap-2 justify-content-start">
+                                                        <div
+                                                            class="align-items-center d-flex product-count gap-2 justify-content-start">
                                                             <span
                                                                 class="d-flex align-items-center justify-content-center fw-600 flex-shrink-0 border-card-qty"
-                                                                onclick="productQuantity({{ $product->id }},'minus', {{ $product?->qty_interval ?? 1 }}, {{ $product?->min_order_qty ?? 1 }})">
+                                                                onclick="productQuantity({{ $product->id }}, 'minus', {{ $product->qty_interval ?? 1 }}, {{ $product->min_order_qty ?? 1 }})">
                                                                 <i class="icon-minus"></i>
                                                             </span>
 
-                                                            <input type="text"
+                                                            <input type="text" id="product_qty_{{ $product->id }}"
                                                                 class="item-quantity cart-item-{{ $product->id }} font-weight-bold mx-2 p-2 text-center border rounded"
                                                                 value="{{ number_format($product->total_quantity_available) }}"
                                                                 name="cart-item-qty[{{ $product->id }}]">
 
                                                             <span
-                                                                class="text-white bg-black d-flex align-items-center justify-content-center
-                            fw-600 flex-shrink-0 border-card-qty"
-                                                                onclick="productQuantity({{ $product->id }}, 'plus', {{ $product?->qty_interval ?? 1 }}, {{ $product?->min_order_qty ?? 1 }})">
+                                                                class="text-white bg-black d-flex align-items-center justify-content-center fw-600 flex-shrink-0 border-card-qty"
+                                                                onclick="productQuantity({{ $product->id }}, 'plus', {{ $product->qty_interval ?? 1 }}, {{ $product->min_order_qty ?? 1 }})">
                                                                 <i class="icon-plus"></i>
                                                             </span>
                                                         </div>
-
+                                                        <button class="add_to_cart_custom"
+                                                            id="add_to_order_btn_{{ $key }}"
+                                                            data-toast-icon="icon-circle-check"
+                                                            onclick="addSingleProductToOrder('{{ $key }}')">
+                                                            {{ $addToCartBtnLabel() }}
+                                                        </button>
                                                     </td>
                                                     <td>
-                                                        {{ currency_format($product->ERP->Price, null, true) }}
-                                                        <span>EA</span>
+                                                        {{ currency_format($product->ERP->Price, null, true) }} /
+                                                        {{ $product->ERP->UnitOfMeasure }}
                                                     </td>
 
-
+                                                    {{-- @php
+                                                    dd($product);
+                                                @endphp --}}
                                                 @empty
                                                 <tr>
                                                     <td colspan="4" class="text-center">
@@ -102,7 +106,7 @@
                                         <select name="per_page"
                                             onchange="$('#customer-item-list-search-form').submit();"
                                             class="form-control form-control-sm mx-1"
-                                            style="width: 65px; background-position: 85%;">
+                                            style="width: 75px; background-position: 85%;">
                                             @foreach (getPaginationLengths() as $length)
                                                 <option value="{{ $length }}"
                                                     @if ($length == request('per_page')) selected @endif>
