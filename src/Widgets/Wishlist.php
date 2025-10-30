@@ -66,4 +66,8 @@ class Wishlist extends BaseComponent
 
         return view('wishlist::customer.wishlist', compact('products', 'wishlist'));
     }
+
+    public function addToCartBtnLabel (){
+        return 'add to cart';
+    }
 }
