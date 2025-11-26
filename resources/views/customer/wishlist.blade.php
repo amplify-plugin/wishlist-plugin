@@ -3,7 +3,7 @@
         <div class="card-body">
             <form id="customer-item-list-search-form" method="get" action="{{ url()->current() }}">
                 <div class="row">
-                    <div class="col-md-6 my-2 mb-md-0">
+                    {{--<div class="col-md-6 my-2 mb-md-0">
                         <div class="d-flex justify-content-center justify-content-md-start">
                             <div class="d-flex justify-content-center justify-content-md-start align-items-center">
                                 <label class="mb-0">
@@ -18,7 +18,7 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
+                    </div>--}}
                     <div class="col-12">
                         <div class="row mx-0 mt-3 justify-center-between list_shop_page_header d-none d-md-flex mb-3">
                             <div class="col-md-1">
@@ -137,6 +137,30 @@
                                 </div>
                             @endforeach
                         </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-12 col-md-5">
+                        <label
+                                class="d-flex justify-content-center justify-content-md-start align-items-center"
+                                style="font-weight: 200;">
+                            Show
+                            <select name="per_page"
+                                    onchange="$('#customer-item-list-search-form').submit();"
+                                    class="form-control form-control-sm mx-1"
+                                    style="width: 75px; background-position: 85%;">
+                                @foreach (getPaginationLengths() as $length)
+                                    <option value="{{ $length }}"
+                                            @if ($length == request('per_page')) selected @endif>
+                                        {{ $length }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            entries
+                        </label>
+                    </div>
+                    <div class="col-sm-12 col-md-7">
+                        {!! $wishlist->withQueryString()->links() !!}
                     </div>
                 </div>
             </form>
