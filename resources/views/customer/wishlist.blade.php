@@ -208,6 +208,7 @@
                         </label>
                     </div>
                     <div class="col-sm-12 col-md-7">
+
                         {!! $wishlist->withQueryString()->links() !!}
                     </div>
                 </div>
