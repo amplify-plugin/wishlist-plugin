@@ -20,7 +20,7 @@
                         </div>
                     </div>--}}
                     <div class="col-12">
-                        <div class="row mx-0 mt-3 justify-center-between list_shop_page_header d-none d-md-flex mb-3">
+                        <div class="row mx-0 justify-center-between list_shop_page_header d-none d-md-flex mb-3">
                             <div class="col-md-1">
                                 <span class="list_view_header"></span>
                             </div>
@@ -51,8 +51,10 @@
                                 <div class="grid-item p-1">
                                     <div class="product-row row mx-1">
                                         <div class="col-12 px-0 col-md-1 text-center text-md-left product-image">
-                                            <a class="text-decoration-none" href="{{ frontendSingleProductURL($product) }}">
-                                                <img src="{{ $product?->productImage?->main ?? '' }}" loading="lazy" alt="{{ $product->product_name ?? '' }}">
+                                            <a class="text-decoration-none"
+                                               href="{{ frontendSingleProductURL($product) }}">
+                                                <img src="{{ $product?->productImage?->main ?? '' }}" loading="lazy"
+                                                     alt="{{ $product->product_name ?? '' }}">
                                             </a>
                                         </div>
                                         <div class="col-md-11 col-12 px-0">
@@ -60,55 +62,97 @@
                                                 <div class="px-0 col-12 col-md-4 text-center text-md-left product-code">
                                                     <a class="fw-700 font-weight-normal text-decoration-none text-black"
                                                        href="{{ frontendSingleProductURL($product) }}">
-                                                        {{ $product->Product_Code ?? '' }}
+                                                        {{ $product->product_code ?? '' }}
                                                     </a>
                                                 </div>
-                                                <div class="px-0 col-12 col-md-2 product-quantity text-black font-weight-normal">
+                                                <div
+                                                    class="px-0 col-12 col-md-2 product-quantity text-black font-weight-normal">
                                                     @if($product->assembled)
                                                         Assembled Item
                                                     @else
                                                         <x-product.availability
-                                                                :product="$product"
-                                                                :value="$product->total_quantity_available"/>
+                                                            :product="$product"
+                                                            :value="$product->total_quantity_available"/>
                                                     @endif
                                                 </div>
                                                 <div class="px-0 col-12 col-md-2 my-2 my-md-0">
                                                     <x-product.price
-                                                            element="div"
-                                                            class="d-block fw-700 w-100 product-price font-weight-normal"
-                                                            :product="$product"
-                                                            :value="$product->ERP?->Price"
-                                                            :uom="$product->ERP?->UnitOfMeasure ?? 'EA'"
+                                                        element="div"
+                                                        class="d-block fw-700 w-100 product-price font-weight-normal"
+                                                        :product="$product"
+                                                        :value="$product->ERP?->Price"
+                                                        :uom="$product->ERP?->UnitOfMeasure ?? 'EA'"
                                                     />
                                                 </div>
                                                 <div class="px-0 col-12 col-md-2 mb-2 mb-md-0 quantity_count_custom">
-                                                    <div class="align-items-center d-flex product-count gap-2 justify-content-between w-100">
-                                                        <span
-                                                                class="text-black d-flex align-items-center justify-content-center fw-600 flex-shrink-0 border-card-qty"
-                                                                onclick="productQuantity({{ $key }},'minus', {{ $product?->qty_interval ?? 1 }}, {{ $product?->min_order_qty ?? 1 }})">
+                                                    <div
+                                                        class="align-items-center d-flex product-count gap-2 justify-content-between w-100">
+                                                        <button
+                                                            type="button"
+                                                            style="width: 32px; height: 32px"
+                                                            class="text-black d-flex align-items-center justify-content-center fw-600 flex-shrink-0 border-card-qty"
+                                                            onclick="Amplify.handleQuantityChange('#product_qty_{{ $key }}', 'decrement');">
                                                             <i class="icon-minus"></i>
-                                                        </span>
-                                                        <div class="border-card-qty align-items-center d-flex fw-600 justify-content-center"
-                                                             style="width: calc(100% - 56px - 16px)">
-                                                            <input type="hidden" id="product_warehouse_{{ $product->Product_Code }}"
+                                                        </button>
+                                                        <div
+                                                            class="border-card-qty align-items-center d-flex fw-600 justify-content-center"
+                                                            style="width: calc(100% - 56px - 16px)">
+                                                            <input type="hidden"
+                                                                   disabled
+                                                                   id="product_warehouse_{{ $product->product_code }}"
                                                                    value="{{ $product?->ERP?->WarehouseID ?? '' }}"/>
-                                                            @include('widgets.product.inc.partial', [
-                                                                'product' => $product,
-                                                                'key' => $key,
-                                                            ])
+                                                            <span class="d-none" id="customer_back_order_code"
+                                                                  data-status="{{ optional(customer())->allow_backorder ? 'Y' : 'N' }}"></span>
+                                                            <input id="product_code_{{ $key }}"
+                                                                   disabled
+                                                                   name="product_code[]" type="hidden"
+                                                                   value="{{ $product->product_code }}">
+                                                            <input id="product_id_{{ $key }}"
+                                                                   disabled
+                                                                   name="product_id[]" type="hidden"
+                                                                   value="{{ $product->id ?? '' }}">
+                                                            <input id="{{ 'product_warehouse_' . $key }}"
+                                                                   disabled
+                                                                   type="hidden"
+                                                                   value="{{ $product->ERP->WarehouseID }}"/>
+                                                            <input
+                                                                class="form-control-sm form-control fw-500 product-qty-{{ $product->product_code }} text-center"
+                                                                id="product_qty_{{ $key }}"
+                                                                data-product-code="{{ $product?->product_code ?? '' }}"
+                                                                data-min-order-qty="{{ $product?->min_order_qty ?? 1 }}"
+                                                                data-qty-interval="{{ $product?->qty_interval ?? 1 }}"
+                                                                placeholder="Min Qty: {{ $product?->min_order_qty ?? 1 }}"
+                                                                type="text"
+                                                                inputmode="number"
+                                                                oninput="Amplify.handleQuantityChange('#product_qty_{{ $key }}', 'input');"
+                                                                value="{{ $product?->min_order_qty ?? 1 }}"
+                                                                @if($key == 0) autofocus @endif
+                                                                min="{{ $product?->min_order_qty ?? 1 }}"
+                                                                step="{{ $product?->qty_interval  ?? 'any' }}"
+                                                                @if(!$product->allow_back_order) max="{{$product->total_quantity_available}}"
+                                                                @endif
+                                                                required/>
+                                                            <span class="d-none" id="product_back_order_{{ $key }}"
+                                                                  data-status="{{ $product->allow_back_order ? 'Y' : 'N' }}"></span>
                                                         </div>
-                                                        <span
-                                                                class="text-white bg-black d-flex align-items-center justify-content-center
+                                                        <button
+                                                            type="button"
+                                                            style="width: 32px; height: 32px"
+                                                            class="text-white bg-black d-flex align-items-center justify-content-center
                                                               fw-600 flex-shrink-0 border-card-qty"
-                                                                onclick="productQuantity({{ $key }},'plus', {{ $product?->qty_interval ?? 1 }}, {{ $product?->min_order_qty ?? 1 }})">
+                                                            onclick="Amplify.handleQuantityChange('#product_qty_{{ $key }}', 'increment');">
                                                             <i class="icon-plus"></i>
-                                                        </span>
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <div class="col-12 col-md-2 d-flex justify-content-center justify-content-md-end">
-                                                    <button class="list_add_to_card_button" id="add_to_order_btn_{{ $key }}"
-                                                            data-toast-icon="icon-circle-check"
-                                                            onclick="addSingleProductToOrder('{{ $key }}')">
+                                                <div
+                                                    class="col-12 col-md-2 d-flex justify-content-center justify-content-md-end">
+                                                    <button
+                                                        type="button"
+                                                        class="list_add_to_card_button"
+                                                        id="add_to_order_btn_{{ $key }}"
+                                                        data-toast-icon="icon-circle-check"
+                                                        onclick="addSingleProductToOrder('{{ $key }}')">
                                                         {{ $addToCartBtnLabel() }}
                                                     </button>
                                                 </div>
@@ -120,14 +164,18 @@
                                                 </div>
                                                 <div class="px-0 col-12">
                                                     <div class="d-flex justify-content-between pb-1 font-weight-normal">
-                                                        <div class="text-black list_contant_product font-weight-normal mb-0">
+                                                        <div
+                                                            class="text-black list_contant_product font-weight-normal mb-0">
                                                             {!! $product->ship_restriction ?? null !!}
                                                         </div>
                                                         <div>
-                                                            <x-product.ncnr-item-flag :product="$product" :show-full-form="true"/>
+                                                            <x-product.ncnr-item-flag :product="$product"
+                                                                                      :show-full-form="true"/>
                                                         </div>
                                                         <div>
-                                                            <x-product.default-document-link :document="$product->default_document" class="list_shop_datasheet_product pr-3"/>
+                                                            <x-product.default-document-link
+                                                                :document="$product->default_document"
+                                                                class="list_shop_datasheet_product pr-3"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -142,8 +190,8 @@
                 <div class="row mt-2">
                     <div class="col-sm-12 col-md-5">
                         <label
-                                class="d-flex justify-content-center justify-content-md-start align-items-center"
-                                style="font-weight: 200;">
+                            class="d-flex justify-content-center justify-content-md-start align-items-center"
+                            style="font-weight: 200;">
                             Show
                             <select name="per_page"
                                     onchange="$('#customer-item-list-search-form').submit();"
