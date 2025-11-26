@@ -57,6 +57,7 @@
                                                      alt="{{ $product->product_name ?? '' }}">
                                             </a>
                                         </div>
+
                                         <div class="col-md-11 col-12 px-0">
                                             <div class="row custom-product-details px-0 px-md-2">
                                                 <div class="px-0 col-12 col-md-4 text-center text-md-left product-code">
@@ -68,13 +69,17 @@
                                                 <div
                                                     class="px-0 col-12 col-md-2 product-quantity text-black font-weight-normal">
                                                     @if($product->assembled)
+
                                                         Assembled Item
+
                                                     @else
+
                                                         <x-product.availability
                                                             :product="$product"
                                                             :value="$product->total_quantity_available"/>
                                                     @endif
                                                 </div>
+
                                                 <div class="px-0 col-12 col-md-2 my-2 my-md-0">
                                                     <x-product.price
                                                         element="div"
