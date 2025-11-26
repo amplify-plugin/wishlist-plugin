@@ -19,202 +19,123 @@
                             </div>
                         </div>
                     </div>
-                    {{--                    @if (customer(true)->can('ship-to-addresses.add'))--}}
-                    {{--                        <div class="col-md-6 mb-2 mb-md-0">--}}
-                    {{--                            <div class="d-flex justify-content-center justify-content-md-end">--}}
-                    {{--                                <a class="btn btn-sm btn-primary mr-0" href="{{ route('frontend.addresses.create') }}">--}}
-                    {{--                                    <i class="icon-plus"></i> Add Address--}}
-                    {{--                                </a>--}}
-                    {{--                            </div>--}}
-                    {{--                        </div>--}}
-                    {{--                    @endif--}}
                     <div class="col-12">
-                        <div class="table-responsive-md pb-4 pb-md-0">
-                            <div class="row">
-                                <div class="col-12">
-                                    <table class="table table-bordered table-striped table-hover my-1">
-                                        <thead>
-                                        <tr>
-                                            <th>{{ __('Product') }}</th>
-                                            <th>{{ __('Quantity Available') }}</th>
-                                            <th>{{ __('Price') }}</th>
-                                            <th>{{ __('Actions') }}</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @forelse($products as $product)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex gap-2">
-                                                        {{ $product->product_name }}
+                        <div class="row mx-0 mt-3 justify-center-between list_shop_page_header d-none d-md-flex mb-3">
+                            <div class="col-md-1">
+                                <span class="list_view_header"></span>
+                            </div>
+                            <div class="col-md-11">
+                                <div class="row align-items-end">
+                                    <div class="col-md-4 header_item_number">
+                                        <span class="list_view_header text-start">Item Number</span>
+                                    </div>
+                                    <div class="col-md-2 header_available_quantity d-flex justify-content-center">
+                                        <span class="list_view_header text-center">Available Qty.</span>
+                                    </div>
+                                    <div class="col-md-2 header_price">
+                                        <span class="list_view_header">Price</span>
+                                    </div>
+                                    <div class="col-md-2 header_quantity">
+                                        <span class="list_view_header text-center">Quantity</span>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="list_view_header"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div @class(["isotope-grid grid-no-gap mt-2 list cols-1"])>
+                            <div class="gutter-sizer"></div>
+                            <div class="grid-sizer"></div>
+                            @foreach ($products as $key => $product)
+                                <div class="grid-item p-1">
+                                    <div class="product-row row mx-1">
+                                        <div class="col-12 px-0 col-md-1 text-center text-md-left product-image">
+                                            <a class="text-decoration-none" href="{{ frontendSingleProductURL($product) }}">
+                                                <img src="{{ $product?->productImage?->main ?? '' }}" loading="lazy" alt="{{ $product->product_name ?? '' }}">
+                                            </a>
+                                        </div>
+                                        <div class="col-md-11 col-12 px-0">
+                                            <div class="row custom-product-details px-0 px-md-2">
+                                                <div class="px-0 col-12 col-md-4 text-center text-md-left product-code">
+                                                    <a class="fw-700 font-weight-normal text-decoration-none text-black"
+                                                       href="{{ frontendSingleProductURL($product) }}">
+                                                        {{ $product->Product_Code ?? '' }}
+                                                    </a>
+                                                </div>
+                                                <div class="px-0 col-12 col-md-2 product-quantity text-black font-weight-normal">
+                                                    @if($product->assembled)
+                                                        Assembled Item
+                                                    @else
+                                                        <x-product.availability
+                                                                :product="$product"
+                                                                :value="$product->total_quantity_available"/>
+                                                    @endif
+                                                </div>
+                                                <div class="px-0 col-12 col-md-2 my-2 my-md-0">
+                                                    <x-product.price
+                                                            element="div"
+                                                            class="d-block fw-700 w-100 product-price font-weight-normal"
+                                                            :product="$product"
+                                                            :value="$product->ERP?->Price"
+                                                            :uom="$product->ERP?->UnitOfMeasure ?? 'EA'"
+                                                    />
+                                                </div>
+                                                <div class="px-0 col-12 col-md-2 mb-2 mb-md-0 quantity_count_custom">
+                                                    <div class="align-items-center d-flex product-count gap-2 justify-content-between w-100">
+                                                        <span
+                                                                class="text-black d-flex align-items-center justify-content-center fw-600 flex-shrink-0 border-card-qty"
+                                                                onclick="productQuantity({{ $key }},'minus', {{ $product?->qty_interval ?? 1 }}, {{ $product?->min_order_qty ?? 1 }})">
+                                                            <i class="icon-minus"></i>
+                                                        </span>
+                                                        <div class="border-card-qty align-items-center d-flex fw-600 justify-content-center"
+                                                             style="width: calc(100% - 56px - 16px)">
+                                                            <input type="hidden" id="product_warehouse_{{ $product->Product_Code }}"
+                                                                   value="{{ $product?->ERP?->WarehouseID ?? '' }}"/>
+                                                            @include('widgets.product.inc.partial', [
+                                                                'product' => $product,
+                                                                'key' => $key,
+                                                            ])
+                                                        </div>
+                                                        <span
+                                                                class="text-white bg-black d-flex align-items-center justify-content-center
+                                                              fw-600 flex-shrink-0 border-card-qty"
+                                                                onclick="productQuantity({{ $key }},'plus', {{ $product?->qty_interval ?? 1 }}, {{ $product?->min_order_qty ?? 1 }})">
+                                                            <i class="icon-plus"></i>
+                                                        </span>
                                                     </div>
-                                                </td>
-                                                <td>
-                                                        {{ number_format($product->total_quantity_available) }}
-                                                </td>
-                                                <td>
-                                                    {{ currency_format($product->ERP->Price, null, true) }}
-                                                </td>
-
-{{--                                                @if ($columns['address_code'])--}}
-{{--                                                    <td>{{ $address->address_code }}</td>--}}
-{{--                                                @endif--}}
-
-{{--                                                @if ($columns['address_name'])--}}
-{{--                                                    <td>{{ $address->address_name }}</td>--}}
-{{--                                                @endif--}}
-
-{{--                                                @if ($columns['address_line'])--}}
-{{--                                                    <td>--}}
-{{--                                                        {!! $address->address_1 ? "{$address->address_1}</br>": null !!}--}}
-{{--                                                        {!! $address->address_2 ? "{$address->address_2}</br>": null !!}--}}
-{{--                                                        {!! $address->address_3 ? "{$address->address_3}</br>": null !!}--}}
-{{--                                                    </td>--}}
-{{--                                                @endif--}}
-
-{{--                                                @if ($columns['city'])--}}
-{{--                                                    <td>--}}
-{{--                                                        {!! $address->city ?? null  !!}--}}
-{{--                                                    </td>--}}
-{{--                                                @endif--}}
-
-{{--                                                @if ($columns['state'])--}}
-{{--                                                    <td>--}}
-{{--                                                        {!! $address->stateModel?->name ?? null  !!}--}}
-{{--                                                    </td>--}}
-{{--                                                @endif--}}
-
-
-{{--                                                @if ($columns['zip_code'])--}}
-{{--                                                    <td>{{ $address->zip_code }}</td>--}}
-{{--                                                @endif--}}
-
-{{--                                                @if ($columns['country'])--}}
-{{--                                                    <td>--}}
-{{--                                                        {!! $address->country?->name ? "{$address->country?->name}" : "{$address->country_code}"  !!}--}}
-{{--                                                    </td>--}}
-{{--                                                @endif--}}
-{{--                                                @if (checkPermissionLength(['ship-to-addresses.view', 'ship-to-addresses.update', 'ship-to-addresses.remove']) > 0)--}}
-{{--                                                    <td class="text-right" style="width: 125px">--}}
-{{--                                                        <div class="btn-group m-0">--}}
-{{--                                                            <button type="button"--}}
-{{--                                                                    class="btn btn-outline-warning mx-0 dropdown-toggle btn-sm"--}}
-{{--                                                                    data-toggle="dropdown" aria-expanded="false">--}}
-{{--                                                                Actions--}}
-{{--                                                            </button>--}}
-{{--                                                            <div class="dropdown-menu dropdown-menu-right">--}}
-{{--                                                                @if (!$address->isDefaultAddress())--}}
-{{--                                                                    <a class="dropdown-item"--}}
-{{--                                                                       href="{{ route('frontend.addresses.default-address', $address->id) }}">--}}
-{{--                                                                        <i class="icon-circle-check mr-1"></i> Set--}}
-{{--                                                                        As--}}
-{{--                                                                        Default--}}
-{{--                                                                    </a>--}}
-{{--                                                                @endif--}}
-{{--                                                                @if (customer(true)->can('ship-to-addresses.view'))--}}
-{{--                                                                    <a class="dropdown-item"--}}
-{{--                                                                       href="{{ route('frontend.addresses.show', $address->id) }}">--}}
-{{--                                                                        <i class="icon-eye mr-1"></i> Preview--}}
-{{--                                                                    </a>--}}
-{{--                                                                @endif--}}
-{{--                                                                @if (customer(true)->can('ship-to-addresses.update'))--}}
-{{--                                                                    <a class="dropdown-item"--}}
-{{--                                                                       href="{{ route('frontend.addresses.edit', $address->id) }}">--}}
-{{--                                                                        <i class="icon-paper-clip mr-1"></i> Edit--}}
-{{--                                                                    </a>--}}
-{{--                                                                @endif--}}
-{{--                                                                @if (customer(true)->can('ship-to-addresses.remove'))--}}
-{{--                                                                    <a class="dropdown-item delete-modal"--}}
-{{--                                                                       href="{{ route('frontend.addresses.destroy', $address->id) }}"--}}
-{{--                                                                       data-target="#delete-modal"--}}
-{{--                                                                       data-toggle="modal"--}}
-{{--                                                                       onclick="setFormAction(this)">--}}
-{{--                                                                        <i class="icon-trash mr-1"></i> Delete--}}
-{{--                                                                    </a>--}}
-{{--                                                                @endif--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </td>--}}
-{{--                                                @else--}}
-{{--                                                    @if (!$address->isDefaultAddress())--}}
-{{--                                                        @include(--}}
-{{--                                                            'widget::customer.permission-component',--}}
-{{--                                                            [--}}
-{{--                                                                'data' => $address,--}}
-{{--                                                                'label' => 'Set As Default',--}}
-{{--                                                                'route' => route(--}}
-{{--                                                                    'frontend.addresses.default-address',--}}
-{{--                                                                    $address->id),--}}
-{{--                                                            ]--}}
-{{--                                                        )--}}
-{{--                                                    @endif--}}
-{{--                                                    @if (customer(true)->can('ship-to-addresses.view'))--}}
-{{--                                                        @include(--}}
-{{--                                                            'widget::customer.permission-component',--}}
-{{--                                                            [--}}
-{{--                                                                'data' => $address,--}}
-{{--                                                                'label' => 'Preview',--}}
-{{--                                                                'route' => route(--}}
-{{--                                                                    'frontend.addresses.show',--}}
-{{--                                                                    $address->id),--}}
-{{--                                                            ]--}}
-{{--                                                        )--}}
-{{--                                                    @endif--}}
-{{--                                                    @if (customer(true)->can('ship-to-addresses.update'))--}}
-{{--                                                        @include(--}}
-{{--                                                            'widget::customer.permission-component',--}}
-{{--                                                            [--}}
-{{--                                                                'data' => $address,--}}
-{{--                                                                'label' => 'Edit',--}}
-{{--                                                                'route' => route(--}}
-{{--                                                                    'frontend.addresses.edit',--}}
-{{--                                                                    $address->id),--}}
-{{--                                                            ]--}}
-{{--                                                        )--}}
-{{--                                                    @endif--}}
-{{--                                                    @if (customer(true)->can('ship-to-addresses.remove'))--}}
-{{--                                                        <a href="{{ route('frontend.addresses.destroy', $address->id) }}"--}}
-{{--                                                           class="delete-modal badge btn-info text-decoration-none mb-1"--}}
-{{--                                                           onclick="setFormAction(this)" data-toggle="modal"--}}
-{{--                                                           data-target="#delete-modal">{{ $label }}</a>--}}
-{{--                                                    @endif--}}
-{{--                                                @endif--}}
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center">
-                                                    No data available in table
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                        </tbody>
-                                    </table>
+                                                </div>
+                                                <div class="col-12 col-md-2 d-flex justify-content-center justify-content-md-end">
+                                                    <button class="list_add_to_card_button" id="add_to_order_btn_{{ $key }}"
+                                                            data-toast-icon="icon-circle-check"
+                                                            onclick="addSingleProductToOrder('{{ $key }}')">
+                                                        {{ $addToCartBtnLabel() }}
+                                                    </button>
+                                                </div>
+                                                <div class="px-0 col-12">
+                                                    <a class="fw-700 d-block text-decoration-none text-black list_contant_product font-weight-normal"
+                                                       href="{{ frontendSingleProductURL($product) }}">
+                                                        {!! $product->product_name ?? '' !!}
+                                                    </a>
+                                                </div>
+                                                <div class="px-0 col-12">
+                                                    <div class="d-flex justify-content-between pb-1 font-weight-normal">
+                                                        <div class="text-black list_contant_product font-weight-normal mb-0">
+                                                            {!! $product->ship_restriction ?? null !!}
+                                                        </div>
+                                                        <div>
+                                                            <x-product.ncnr-item-flag :product="$product" :show-full-form="true"/>
+                                                        </div>
+                                                        <div>
+                                                            <x-product.default-document-link :document="$product->default_document" class="list_shop_datasheet_product pr-3"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-sm-12 col-md-5">
-                                    <label
-                                        class="d-flex justify-content-center justify-content-md-start align-items-center"
-                                        style="font-weight: 200;">
-                                        Show
-                                        <select name="per_page"
-                                                onchange="$('#customer-item-list-search-form').submit();"
-                                                class="form-control form-control-sm mx-1"
-                                                style="width: 65px; background-position: 85%;">
-                                            @foreach (getPaginationLengths() as $length)
-                                                <option value="{{ $length }}"
-                                                        @if ($length == request('per_page')) selected @endif>
-                                                    {{ $length }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        entries
-                                    </label>
-                                </div>
-                                <div class="col-sm-12 col-md-7">
-                                    {!! $wishlist->withQueryString()->links() !!}
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
