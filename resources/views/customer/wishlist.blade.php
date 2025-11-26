@@ -172,6 +172,7 @@
                                                             <x-product.ncnr-item-flag :product="$product"
                                                                                       :show-full-form="true"/>
                                                         </div>
+
                                                         <div>
                                                             <x-product.default-document-link
                                                                 :document="$product->default_document"
@@ -208,7 +209,6 @@
                         </label>
                     </div>
                     <div class="col-sm-12 col-md-7">
-
                         {!! $wishlist->withQueryString()->links() !!}
                     </div>
                 </div>
