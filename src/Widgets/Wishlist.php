@@ -66,39 +66,29 @@ class Wishlist extends BaseComponent
 
         $warehouse_codes = array_unique([$erpCustomer->DefaultWarehouse, customer()?->warehouse?->code, config('amplify.frontend.guest_checkout_warehouse')]);
 
-        $products = $products->map(function ($product) use ($priceAndAvail, $warehouse_codes, $productDefaultDocumentTypes) {
+        $products = $products->map(function ($product) use ($priceAndAvail, $warehouse_codes, $wishlist) {
             $filteredPriceAvailability = $priceAndAvail
-                ->where('ItemNumber', $product->Product_Code)
+                ->where('ItemNumber', $product->product_code)
                 ->whereIn('WarehouseID', $warehouse_codes);
 
             $product->ERP = $filteredPriceAvailability->isNotEmpty()
                 ? $filteredPriceAvailability->first()
-                : $priceAndAvail->where('ItemNumber', $product->Product_Code)
+                : $priceAndAvail->where('ItemNumber', $product->product_code)
                     ->first();
 
             $product->avaliable = $priceAndAvail
-                ->where('ItemNumber', $product->Product_Code)
+                ->where('ItemNumber', $product->product_code)
                 ->where('QuantityAvailable', '>=', 1)
                 ->count();
 
             $product->Product_Name = strip_tags(explode('<B>', $product->Product_Name)[0] ?? '');
-            $product->total_quantity_available = $priceAndAvail->where('ItemNumber', $product->Product_Code)->sum('QuantityAvailable');
-            $orderList = $this->productExistOnFavorite($product->id, $product);
-            $product->exists_in_favorite = $orderList != null;
-            $product->favorite_list_id = $orderList->id ?? null;
-            $ownProduct = $product;
-            $product->mpn = $ownProduct->manufacturer ?? 'N/A';
-            $product->min_order_qty = $product->ERP->MinOrderQuantity ?? $ownProduct->min_order_qty;
-            $product->qty_interval = $product->ERP->QuantityInterval ?? $ownProduct->qty_interval;
-            $product->allow_back_order = $product->ERP->AllowBackOrder ?? $ownProduct->allow_back_order ?? false;
-            $product->default_document = $productDefaultDocumentTypes->firstWhere('product_id', '=', $product->id);
-            $product->in_stock = $ownProduct?->vendornum == 3160 ? true : $ownProduct->in_stock ?? false;
-            $product->is_ncnr = $ownProduct?->is_ncnr ?? false;
-            $product->ship_restriction = $ownProduct->ship_restriction ?? false;
-            $product->availability = $ownProduct->availability ?? ProductAvailabilityEnum::Actual;
-            $product->assembled = $ownProduct?->vendornum == 3160;
+            $product->total_quantity_available = $priceAndAvail->where('ItemNumber', $product->product_code)->sum('QuantityAvailable');
+            $product->mpn = $product->manufacturer ?? 'N/A';
+            $product->min_order_qty = $product->ERP->MinOrderQuantity ?? $product->min_order_qty;
+            $product->qty_interval = $product->ERP->QuantityInterval ?? $product->qty_interval;
+            $product->allow_back_order = $product->ERP->AllowBackOrder ?? $product->allow_back_order ?? false;
+            $product->availability = $product->availability ?? ProductAvailabilityEnum::Actual;
             $product->pricing = true;
-
             return $product;
         });
 
