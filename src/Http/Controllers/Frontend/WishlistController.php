@@ -7,6 +7,7 @@ use Amplify\Frontend\Http\Requests\UpdateOrderListRequest;
 use Amplify\Frontend\Traits\HasDynamicPage;
 use Amplify\System\Backend\Models\OrderList;
 use Amplify\System\Backend\Models\OrderListItem;
+use Amplify\Wishlist\Http\Requests\WishlistNotificationRequest;
 use Amplify\Wishlist\Models\Wishlist;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -144,5 +145,33 @@ class WishlistController extends Controller
             'exists' => $wishlist->isNotEmpty(),
             'data' => $wishlist->first()
         ]);
+    }
+
+    public function notification(WishlistNotificationRequest $request): JsonResponse
+    {
+        try {
+
+            $contact = customer(true);
+
+            $notify = $request->boolean('notify', true);
+
+            $wishlistItem = Wishlist::where('customer_id', '=', $contact->customer_id)
+                ->where('contact_id', '=', $contact->id)
+                ->where('product_id', '=', $request->input('product_id'))
+                ->first();
+
+            if (!$wishlistItem) {
+                throw new \Exception("Wishlist Item doesn't exist");
+            }
+
+            if (!$wishlistItem->update(['notify' => $notify])) {
+                throw new \Exception(__('Wishlist notification status update failed.'));
+            }
+
+            return $this->apiResponse(true, __('Wishlist notification status changed successfully.'));
+
+        } catch (\Exception $exception) {
+            return $this->apiResponse(false, $exception->getMessage(), 500);
+        }
     }
 }

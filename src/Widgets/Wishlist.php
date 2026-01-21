@@ -30,14 +30,7 @@ class Wishlist extends BaseComponent
 
         $ids = array_unique($wishlist->pluck('product_id')->toArray());
 
-        $products = Product::select(DB::raw('*, product_code AS Product_Code'))->whereIn('id', $ids)->with('productImage')->get();
-
-        $productDefaultDocumentTypes = DocumentType::select(['document_types.*', 'document_type_product.file_path', 'document_type_product.product_id'])
-            ->join('document_type_product', function (JoinClause $join) use ($ids) {
-                return $join->whereIn('product_id', $ids);
-            })
-            ->where('document_types.id', '=', config('amplify.pim.document_type'))
-            ->get();
+        $products = Product::whereIn('id', $ids)->with('productImage')->get();
 
         $codes = [];
 
@@ -81,13 +74,14 @@ class Wishlist extends BaseComponent
                 ->where('QuantityAvailable', '>=', 1)
                 ->count();
 
-            $product->Product_Name = strip_tags(explode('<B>', $product->Product_Name)[0] ?? '');
+            $product->product_name = strip_tags(explode('<B>', $product->product_name)[0] ?? '');
             $product->total_quantity_available = $priceAndAvail->where('ItemNumber', $product->product_code)->sum('QuantityAvailable');
             $product->mpn = $product->manufacturer ?? 'N/A';
             $product->min_order_qty = $product->ERP->MinOrderQuantity ?? $product->min_order_qty;
             $product->qty_interval = $product->ERP->QuantityInterval ?? $product->qty_interval;
             $product->allow_back_order = $product->ERP->AllowBackOrder ?? $product->allow_back_order ?? false;
             $product->availability = $product->availability ?? ProductAvailabilityEnum::Actual;
+            $product->notify = $wishlist->firstWhere('product_id', $product->id)->notify ?? false;
             $product->pricing = true;
             return $product;
         });

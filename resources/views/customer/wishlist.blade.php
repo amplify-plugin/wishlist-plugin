@@ -29,9 +29,12 @@
                                            id="product-item-list">
                                         <thead>
                                         <tr>
-                                            <th width="150">{{__('Product Code')}}</th>
+                                            <th width="200">{{__('Product Code')}}</th>
                                             <th>{{__('Product')}}</th>
-                                            <th>{{__('Available Quantity')}}</th>
+                                            <th>{{__('Notify')}}<i class="pe-7s-info font-weight-bolder ml-1"
+                                                                   data-toggle="tooltip"
+                                                                   title="System will sent a restock notification email."></i>
+                                            </th>
                                             <th width="200">{{__('Quantity')}}</th>
                                             <th width="125px">{{__('Options')}}</th>
                                         </tr>
@@ -52,25 +55,56 @@
                                                            name="products[{{$key}}][product_code]"
                                                            value="{{ $product->product_code }}"/>
                                                 </td>
-                                                <td class="align-baseline">
-                                                    <div class="d-flex gap-2 justify-content-start">
-                                                        <a class="text-decoration-none"
-                                                           style="width: 90px; height: 90px"
-                                                           href="{{ frontendSingleProductURL(optional($product)) }}">
-                                                            <img title="View Product"
-                                                                 class="img-thumbnail product-thumb"
-                                                                 style="object-fit: contain; width: 100%; height: 100%"
-                                                                 src="{{ assets_image(optional($product)->productImage->main ?? '') }}"
-                                                                 alt="{{ optional($product)->Product_Name }}">
-                                                        </a>
-                                                        <a class="text-decoration-none"
-                                                           href="{{ frontendSingleProductURL(optional($product)) }}">
-                                                            <p>{!! optional($product)->product_name ?? '' !!}</p>
-                                                        </a>
+                                                <td class="align-baseline d-flex gap-2 justify-content-start">
+                                                    <a class="text-decoration-none"
+                                                       style="width: 90px; height: 90px"
+                                                       href="{{ frontendSingleProductURL(optional($product)) }}">
+                                                        <img title="View Product"
+                                                             class="img-thumbnail product-thumb"
+                                                             style="object-fit: contain; width: 100%; height: 100%"
+                                                             src="{{ assets_image(optional($product)->productImage->main ?? '') }}"
+                                                             alt="{{ optional($product)->product_name }}">
+                                                    </a>
+                                                    <div class="w-100">
+                                                        <p class="d-block text-truncate text-primary font-weight-bold mb-2">
+                                                            <a class="text-decoration-none"
+                                                               href="{{ frontendSingleProductURL(optional($product)) }}">
+                                                                {!! optional($product)->product_name ?? '' !!}
+                                                            </a>
+                                                        </p>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                Available Quantity:
+                                                                <x-product.availability
+                                                                        :product="$product"
+                                                                        :value="$product?->total_quantity_available"/>
+                                                            </div>
+                                                            <div class="col-md-6 d-flex gap-2">
+                                                                Price:
+                                                                <x-product.price
+                                                                        element="div"
+                                                                        class="font-weight-bold d-flex"
+                                                                        :product="$product"
+                                                                        :value="$product->ERP?->Price"
+                                                                        :uom="$product->ERP?->UnitOfMeasure ?? 'EA'"/>
+                                                            </div>
+                                                            @if(!empty($product->ship_restriction))
+                                                                <div class="col-md-12">
+                                                                    <p class="mt-2">{{ $product->ship_restriction }}</p>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                        <p class="text-danger d-block"
+                                                           id="product-{{ $key }}-error"></p>
                                                     </div>
-                                                    <p class="text-danger d-block" id="product-{{ $key }}-error"></p>
                                                 </td>
-                                                <td>{{ $product->total_quantity_available }}</td>
+                                                <td class="text-center">
+                                                    @if($product->notify)
+                                                        <p class="text-success font-weight-bold">Yes</p>
+                                                    @else
+                                                        <p class="text-danger font-weight-bold">No</p>
+                                                    @endif
+                                                </td>
                                                 <td width="200">
                                                     <x-cart.quantity-update
                                                             name="products[{{ $key }}][qty]"
@@ -86,17 +120,35 @@
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right">
                                                             <a class="dropdown-item"
-                                                               href="javascript:void(0);"
-                                                               onclick="Amplify.removeWishListItem(this);"
-                                                               data-url="{{ route('frontend.wishlist.destroy', $product->id) }}">
-                                                                <i class="icon-ban mr-1"></i> {{ __('Remove') }}
-                                                            </a>
-                                                            <a class="dropdown-item"
                                                                href="javascript:void(0)"
                                                                data-warehouse="{{ \ErpApi::getCustomerDetail()->DefaultWarehouse }}"
                                                                data-options="{{ json_encode(['code' => $product?->product_code ?? '']) }}"
-                                                               onclick="Amplify.addSingleItemToCart(this, '{{ "#cart-item-{$key}" }}');"
-                                                            ><i class="icon-bag mr-1"></i> {{ __('Add to Cart') }}</a>
+                                                               onclick="Amplify.addSingleItemToCart(this, '{{ "#cart-item-{$key}" }}');">
+                                                                <i class="icon-bag mr-1"></i>
+                                                                {{ __('Add to Cart') }}
+                                                            </a>
+                                                            @if($product->notify)
+                                                                <a class="dropdown-item"
+                                                                   href="javascript:void(0);"
+                                                                   onclick="Amplify.updateWishlistNotification({{ $product->id }}, false);">
+                                                                    <i class="icon-ban mr-1"></i>
+                                                                    {{ __('Don\'t Notify when Re-Stocked') }}
+                                                                </a>
+                                                            @else
+                                                                <a class="dropdown-item"
+                                                                   href="javascript:void(0);"
+                                                                   onclick="Amplify.updateWishlistNotification({{ $product->id }}, true);">
+                                                                    <i class="icon-bell mr-1"></i>
+                                                                    {{ __('Notify when Re-Stocked') }}
+                                                                </a>
+                                                            @endif
+
+                                                            <a class="dropdown-item"
+                                                               href="javascript:void(0);"
+                                                               onclick="Amplify.removeWishListItem(this);"
+                                                               data-url="{{ route('frontend.wishlist.destroy', $product->id) }}">
+                                                                <i class="icon-trash mr-1"></i> {{ __('Remove') }}
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -395,6 +447,47 @@
                     }
                 });
         };
+
+        Amplify.updateWishlistNotification = function (productId, notify = true) {
+            Amplify.confirm(notify
+                    ? '{{ __('The system will send an email when the item becomes available.') }}'
+                    : '{{ __('You will stop receiving notifications when this item becomes available.') }}',
+                'Wishlist', 'Confirm', {
+                    customClass: {
+                        confirmButton: notify ? 'btn btn-primary' : 'btn btn-danger',
+                    },
+                    preConfirm: async function () {
+                        return new Promise((resolve, reject) => {
+                            $.ajax({
+                                url: "{{ route('frontend.wishlist.notification') }}",
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {product_id: productId, notify: notify ? 1 : 0},
+                                header: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                success: function (result) {
+                                    resolve(result);
+                                },
+                                error: function (xhr, status, err) {
+                                    let response = JSON.parse(xhr.responseText);
+                                    window.swal.showValidationMessage(response.message);
+                                    window.swal.hideLoading();
+                                    reject(false);
+                                },
+                            });
+                        });
+                    },
+                    allowOutsideClick: () => !window.swal.isLoading()
+                })
+                .then(function (result) {
+                    if (result.isConfirmed) {
+                        Amplify.notify('success', result.value.message, 'Wishlist');
+                        setTimeout(() => window.location.reload(), 2500)
+                    }
+                });
+        }
     </script>
 @endpush
 

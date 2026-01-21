@@ -27,6 +27,9 @@ Route::name('frontend.wishlist.')->middleware(['web', ProtectAgainstSpam::class,
         ->name('update')
         ->where(['product_id' => '[0-9]+']);
 
+    Route::post('wishlist/notification', [WishlistController::class, 'notification'])
+        ->name('notification');
+
     Route::get('wishlist/check/{product_id?}', [WishlistController::class, 'check'])->name('check');
 
 });
