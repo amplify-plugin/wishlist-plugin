@@ -4,20 +4,16 @@
             <form id="customer-item-list-search-form" method="get" action="{{ url()->current() }}">
                 <div class="row">
                     <div class="col-md-6 my-2 mb-md-0">
-{{--                        <div class="d-flex justify-content-center justify-content-md-start">--}}
-{{--                            <label aria-label="search">--}}
-{{--                                <input type="search" aria-label="search" name="search"--}}
-{{--                                       class="form-control form-control-sm"--}}
-{{--                                       placeholder="Search...." value="{{ request('search') }}">--}}
-{{--                            </label>--}}
-{{--                        </div>--}}
+                        {{--                        <div class="d-flex justify-content-center justify-content-md-start">--}}
+                        {{--                            <label aria-label="search">--}}
+                        {{--                                <input type="search" aria-label="search" name="search"--}}
+                        {{--                                       class="form-control form-control-sm"--}}
+                        {{--                                       placeholder="Search...." value="{{ request('search') }}">--}}
+                        {{--                            </label>--}}
+                        {{--                        </div>--}}
                     </div>
                     <div class="col-md-6 mb-2 mb-md-0">
                         <div class="d-flex justify-content-center justify-content-md-end">
-                            <!-- <button type="button" class="btn btn-sm btn-primary btn-right m-2  create-order">
-                                {{__('Create Order')}}
-                            </button> -->
-
                             <button type="button"
                                     class="btn btn-sm btn-success btn-right my-2 ml-2 mr-0"
                                     onclick="Amplify.addMultipleItemToCart(this, '#customer-item-list-search-form')">
@@ -58,11 +54,12 @@
                                                 </td>
                                                 <td class="align-baseline">
                                                     <div class="d-flex gap-2 justify-content-start">
-                                                        <a class="text-decoration-none" style="width: 90px; height: 90px"
+                                                        <a class="text-decoration-none"
+                                                           style="width: 90px; height: 90px"
                                                            href="{{ frontendSingleProductURL(optional($product)) }}">
                                                             <img title="View Product"
                                                                  class="img-thumbnail product-thumb"
-                                                                 style="object-fit: contain"
+                                                                 style="object-fit: contain; width: 100%; height: 100%"
                                                                  src="{{ assets_image(optional($product)->productImage->main ?? '') }}"
                                                                  alt="{{ optional($product)->Product_Name }}">
                                                         </a>
@@ -88,11 +85,10 @@
                                                             Actions
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-right">
-                                                            <a class="dropdown-item delete-modal"
+                                                            <a class="dropdown-item"
                                                                href="javascript:void(0);"
-                                                               onclick="setFormAction(this)"
-                                                               data-toggle="modal" data-target="#remove-item"
-                                                               data-action="{{ route('frontend.wishlist.destroy', $product->id) }}">
+                                                               onclick="Amplify.removeWishListItem(this);"
+                                                               data-url="{{ route('frontend.wishlist.destroy', $product->id) }}">
                                                                 <i class="icon-ban mr-1"></i> {{ __('Remove') }}
                                                             </a>
                                                             <a class="dropdown-item"
@@ -362,91 +358,44 @@
     </div>
 </div>
 
-@push('html-default')
-    <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true" data-backdrop="static"
-         data-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger d-flex align-items-center p-3">
-                    <h5 class="modal-title text-white">Delete Confirmation</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="#" method="POST" class="d-inline" id="form-delete">
-                    @method('delete')
-                    @csrf
-                    <div class="modal-body">
-                        <p class="text-center">{{ __('Are you sure you want to delete this item?') }}</p>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-between">
-                        <button type="button" class="btn btn-secondary"
-                                data-dismiss="modal">
-                            {{ __('Cancel') }}
-                        </button>
-                        <button type="submit" class="btn btn-danger" name="delete_user">{{ __('Delete') }}</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-@endpush
-
 @push('internal-script')
     <script>
-        function setFormAction(e) {
-            const form = $('#form-delete');
-            const deleteBtn = $(e);
-            form.attr('action', deleteBtn.attr('href'));
-        }
-
-        (function () {
-            // Build a URL that keeps all params except `search` and `page`
-            function buildUrlPreservingOthers(formAction) {
-                var current = new URL(window.location.href);
-
-                // If a form action is set, use its pathname but keep current search params
-                if (formAction) {
-                    var base = new URL(formAction, window.location.origin);
-                    current.pathname = base.pathname; // ensures no duplicated path segments
-                }
-
-                current.searchParams.delete('search');
-                current.searchParams.delete('page');
-                return current.pathname + (current.search || '');
-            }
-
-            // Use event delegation so it works no matter when the button is rendered
-            document.addEventListener('click', function (e) {
-                var btn = e.target.closest('#clear-search');
-                if (!btn) return;
-
-                e.preventDefault();
-                var form = document.getElementById('customer-item-list-search-form');
-                var action = form ? form.getAttribute('action') : null;
-
-                var next = buildUrlPreservingOthers(action);
-                window.location.assign(next);
-            }, true);
-        })();
+        Amplify.removeWishListItem = function (target) {
+            let actionLink = target.dataset.url;
+            Amplify.confirm('Are you sure to remove this item?',
+                'Wishlist', 'Remove', {
+                    preConfirm: async function () {
+                        return new Promise((resolve, reject) => {
+                            $.ajax({
+                                url: actionLink,
+                                type: 'DELETE',
+                                dataType: 'json',
+                                header: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                success: function (result) {
+                                    resolve(result);
+                                },
+                                error: function (xhr, status, err) {
+                                    let response = JSON.parse(xhr.responseText);
+                                    window.swal.showValidationMessage(response.message);
+                                    window.swal.hideLoading();
+                                    reject(false);
+                                },
+                            });
+                        });
+                    },
+                    allowOutsideClick: () => !window.swal.isLoading()
+                })
+                .then(function (result) {
+                    if (result.isConfirmed) {
+                        Amplify.notify('success', result.value.message, 'Wishlist');
+                        setTimeout(() => window.location.reload(), 2500)
+                    }
+                });
+        };
     </script>
 @endpush
 
 
-
-<script>
-    function productQuantity(id, type, interval, min) {
-        let item = document.getElementById(`product_qty_${id}`);
-        let val = parseInt(item.value);
-        switch (type) {
-            case 'plus':
-                item.value = val + interval;
-                break;
-            case 'minus':
-                if (val > min) {
-                    item.value = val - interval;
-                }
-                break;
-        }
-    }
-</script>
