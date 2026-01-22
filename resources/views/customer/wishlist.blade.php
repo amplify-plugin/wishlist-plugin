@@ -124,7 +124,7 @@
                                                                data-warehouse="{{ \ErpApi::getCustomerDetail()->DefaultWarehouse }}"
                                                                data-options="{{ json_encode(['code' => $product?->product_code ?? '']) }}"
                                                                onclick="Amplify.addSingleItemToCart(this, '{{ "#cart-item-{$key}" }}');">
-                                                                <i class="icon-bag mr-1"></i>
+                                                                <i class="pe-7s-cart font-weight-bolder mr-1"></i>
                                                                 {{ __('Add to Cart') }}
                                                             </a>
                                                             @if($product->notify)
@@ -145,9 +145,9 @@
 
                                                             <a class="dropdown-item"
                                                                href="javascript:void(0);"
-                                                               onclick="Amplify.removeWishListItem(this);"
-                                                               data-url="{{ route('frontend.wishlist.destroy', $product->id) }}">
-                                                                <i class="icon-trash mr-1"></i> {{ __('Remove') }}
+                                                               onclick="Amplify.deleteConfirmation(this, 'Wishlist');"
+                                                               data-action="{{ route('frontend.wishlist.destroy', $product->id) }}">
+                                                                <i class="icon-trash mr-1"></i> {{ __('Delete') }}
                                                             </a>
                                                         </div>
                                                     </div>
@@ -412,42 +412,6 @@
 
 @push('internal-script')
     <script>
-        Amplify.removeWishListItem = function (target) {
-            let actionLink = target.dataset.url;
-            Amplify.confirm('Are you sure to remove this item?',
-                'Wishlist', 'Remove', {
-                    preConfirm: async function () {
-                        return new Promise((resolve, reject) => {
-                            $.ajax({
-                                url: actionLink,
-                                type: 'DELETE',
-                                dataType: 'json',
-                                header: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json'
-                                },
-                                success: function (result) {
-                                    resolve(result);
-                                },
-                                error: function (xhr, status, err) {
-                                    let response = JSON.parse(xhr.responseText);
-                                    window.swal.showValidationMessage(response.message);
-                                    window.swal.hideLoading();
-                                    reject(false);
-                                },
-                            });
-                        });
-                    },
-                    allowOutsideClick: () => !window.swal.isLoading()
-                })
-                .then(function (result) {
-                    if (result.isConfirmed) {
-                        Amplify.notify('success', result.value.message, 'Wishlist');
-                        setTimeout(() => window.location.reload(), 2500)
-                    }
-                });
-        };
-
         Amplify.updateWishlistNotification = function (productId, notify = true) {
             Amplify.confirm(notify
                     ? '{{ __('The system will send an email when the item becomes available.') }}'
