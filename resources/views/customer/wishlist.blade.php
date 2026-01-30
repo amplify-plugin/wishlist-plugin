@@ -29,7 +29,6 @@
                                            id="product-item-list">
                                         <thead>
                                         <tr>
-                                            <th width="200">{{__('Product Code')}}</th>
                                             <th>{{__('Product')}}</th>
                                             <th>{{__('Notify')}}<i class="pe-7s-info font-weight-bolder ml-1"
                                                                    data-toggle="tooltip"
@@ -42,20 +41,18 @@
                                         <tbody>
                                         @forelse($products as $key => $product)
                                             <tr class="added_products align-center" id="product-{{ $key }}">
-                                                <td>
+                                                <td class="align-baseline d-flex gap-2 justify-content-start">
                                                     <input type="hidden"
                                                            name="products[{{ $key }}][product_warehouse_code]"
                                                            value="{{\ErpApi::getCustomerDetail()->DefaultWarehouse }}"/>
                                                     <input type="hidden" name="products[{{ $key }}][product_id]"
                                                            value="{{ $product->id }}"/>
-                                                    <input type="text"
+                                                    <input type="hidden"
                                                            id="product-code-{{$key}}"
                                                            class="form-control form-control-sm"
                                                            readonly
                                                            name="products[{{$key}}][product_code]"
                                                            value="{{ $product->product_code }}"/>
-                                                </td>
-                                                <td class="align-baseline d-flex gap-2 justify-content-start">
                                                     <a class="text-decoration-none"
                                                        style="width: 90px; height: 90px"
                                                        href="{{ frontendSingleProductURL(optional($product)) }}">
@@ -67,6 +64,7 @@
                                                     </a>
                                                     <div class="w-100">
                                                         <p class="d-block text-truncate text-primary font-weight-bold mb-2">
+                                                            <span class="mb-2 text-black d-block">{{ $product->product_code }}</span>
                                                             <a class="text-decoration-none"
                                                                href="{{ frontendSingleProductURL(optional($product)) }}">
                                                                 {!! optional($product)->product_name ?? '' !!}
@@ -173,7 +171,7 @@
                                         <select name="per_page"
                                                 onchange="$('#customer-item-list-search-form').submit();"
                                                 class="form-control form-control-sm mx-1"
-                                                style="width: 65px; background-position: 85%;">
+                                                style="width: 75px; background-position: 85%;">
                                             @foreach (getPaginationLengths() as $length)
                                                 <option value="{{ $length }}"
                                                         @if ($length == request('par_page')) selected @endif>
