@@ -34,8 +34,8 @@
                                                                    data-toggle="tooltip"
                                                                    title="System will sent a restock notification email."></i>
                                             </th>
-                                            <th width="200">{{__('Quantity')}}</th>
-                                            <th width="125px">{{__('Options')}}</th>
+                                            <th width="200" class="text-center">{{ __('Quantity') }}</th>
+                                            <th width="125" class="text-center">{{__('Actions')}}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
