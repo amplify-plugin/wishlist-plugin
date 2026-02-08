@@ -1,6 +1,5 @@
 <?php
 
-use Amplify\System\Backend\Http\Middlewares\ContactForceShippingAddressSelection;
 use Amplify\Wishlist\Http\Controllers\Frontend\WishlistController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Honeypot\ProtectAgainstSpam;
@@ -15,7 +14,7 @@ Route::middleware(array_merge(config('backpack.base.web_middleware', ['web']),
     });
 
 //Frontend Routes
-Route::name('frontend.wishlist.')->middleware(['web', ProtectAgainstSpam::class, ContactForceShippingAddressSelection::class, 'auth:customer'])->group(function () {
+Route::name('frontend.wishlist.')->middleware(['web', ProtectAgainstSpam::class, 'auth:customer'])->group(function () {
     Route::get('wishlist', [WishlistController::class, 'index'])->name('index');
     Route::post('wishlist', [WishlistController::class, 'add'])->name('store');
 
