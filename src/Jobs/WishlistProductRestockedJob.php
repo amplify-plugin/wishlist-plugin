@@ -44,7 +44,9 @@ class WishlistProductRestockedJob implements ShouldQueue
 
         Wishlist::whereProductId($product->id)
             ->whereNotify(true)
-            ->whereLastNotifiedAt(null)->get()->each(function (Wishlist $wishlist) {
+            ->whereLastNotifiedAt(null)
+            ->get()
+            ->each(function (Wishlist $wishlist) {
                 foreach ($this->eventInfo->eventActions as $eventAction) {
                     if ($eventAction->eventTemplate->notification_type == 'emailable') {
                         $this->emailService->sendWishlistProductRestockedEmail($eventAction, $wishlist);
