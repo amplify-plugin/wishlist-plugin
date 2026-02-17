@@ -86,6 +86,10 @@ class WishlistController extends Controller
                 'product_id' => $product_id
             ])->first();
 
+            if (!$wishlist) {
+                throw new \Exception("Wishlist item not found.");
+            }
+
             $wishlist->deleteQuietly();
 
             return response()->json([

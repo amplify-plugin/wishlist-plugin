@@ -43,7 +43,7 @@
                     ShowNotification('error', 'Wishlist', JSON.parse(xhr.responseText).message ?? 'Something went wrong. Please try again later.');
                 }
             }).done(function () {
-                checkOnWishlist('product-' + product_id, product_id);
+                checkOnWishlist(product_id);
             });
         }
 
@@ -68,11 +68,16 @@
 
             $.get('{{ route('frontend.wishlist.check') }}/' + product_id, function (response) {
                 button.empty();
-                if (response.exists) {
-                    button.data('state', response.data.id ? 'true' : 'false');
+                if (response && response.exists) {
+                    var state = (response.data && response.data.id) ? 'true' : 'false';
+                    button.data('state', state);
+                    button.attr('data-state', state);
                     button.attr("class").includes('outline') ? button.addClass('btn-outline-danger') : button.addClass('btn-danger');
                     button.append(removeTemplate);
                 } else {
+                    button.data('state', 'false');
+                    button.attr('data-state', 'false');
+                    button.removeClass('btn-danger btn-outline-danger');
                     button.addClass('btn-' + variant);
                     button.append(addTemplate);
                 }
