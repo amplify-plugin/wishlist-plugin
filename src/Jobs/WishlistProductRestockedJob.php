@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use function Adminer\where;
 
 class WishlistProductRestockedJob implements ShouldQueue
 {
@@ -44,7 +45,10 @@ class WishlistProductRestockedJob implements ShouldQueue
 
         Wishlist::whereProductId($product->id)
             ->whereNotify(true)
-            ->whereLastNotifiedAt(null)
+            ->where(function ($query) {
+                return $query->whereNull('last_notified_at')
+                    ->orWhere('last_notified_at', '<=', now()->subDays('wishlist.notify_interval'));
+            })
             ->get()
             ->each(function (Wishlist $wishlist) {
                 foreach ($this->eventInfo->eventActions as $eventAction) {

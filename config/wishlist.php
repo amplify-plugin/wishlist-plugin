@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'notify_interval' => ''
+    'notify_interval' => 7
 ];
