@@ -22,18 +22,18 @@ class WishlistEventSeeder extends Seeder
                 'enabled' => true,
                 'description' => 'This event get triggered when program system received a wishlisted item is avaliable to order.',
                 'eventVariables' => [
-                    new EventVariable(['name' => '__full_name__', 'value' => '', 'description' => 'Contact full name who add the item to their wishlist', 'for_admin' => false]),
-                    new EventVariable(['name' => '__product_name__', 'value' => '', 'description' => 'Wishlisted item name ', 'for_admin' => false]),
-                    new EventVariable(['name' => '__product_code__', 'value' => '', 'description' => 'Wishlisted item number/product code ', 'for_admin' => false]),
-                    ],
+                    ['name' => '__full_name__', 'value' => '', 'description' => 'Contact full name who add the item to their wishlist'],
+                    ['name' => '__product_name__', 'value' => '', 'description' => 'Wishlisted item name '],
+                    ['name' => '__product_code__', 'value' => '', 'description' => 'Wishlisted item number/product code '],
+                ],
                 'eventRecipents' => [
-                    new EventRecipent(['name' => 'Admin', 'event_action_field' => 'is_get_admin', 'description' => 'System Administrator', 'enabled' => true]),
-                    new EventRecipent(['name' => 'Customer', 'event_action_field' => 'is_get_customer', 'description' => 'Customer', 'enabled' => true]),
-                    new EventRecipent(['name' => 'Business_Contact', 'event_action_field' => 'is_get_customer_business_contact', 'description' => 'Customer Business Contact', 'enabled' => true]),
-                    new EventRecipent(['name' => 'Contact', 'event_action_field' => 'is_get_contact', 'description' => 'Contact', 'enabled' => true]),
+                    ['name' => 'Admin', 'event_action_field' => 'is_get_admin', 'description' => 'System Administrator'],
+                    ['name' => 'Customer', 'event_action_field' => 'is_get_customer', 'description' => 'Customer'],
+                    ['name' => 'Business_Contact', 'event_action_field' => 'is_get_customer_business_contact', 'description' => 'Customer Business Contact'],
+                    ['name' => 'Contact', 'event_action_field' => 'is_get_contact', 'description' => 'Contact'],
                 ],
                 'eventTemplates' => [
-                    new EventTemplate([
+                    [
                         'name' => '[Customer] Wishlist Item Restocked Notification',
                         'subject' => 'Your Wishlist Item is Back in Stock',
                         'email_body' => <<<HTML
@@ -59,7 +59,7 @@ HTML,
                         'enabled' => true,
                         'created_at' => '2024-10-25 15:44:58',
                         'updated_at' => '2024-10-25 15:44:58',
-                    ])
+                    ]
                 ]
             ]
         ];
