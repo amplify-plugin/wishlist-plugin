@@ -2,7 +2,7 @@
 
 namespace Amplify\Wishlist;
 
-use Amplify\Widget\Abstracts\Widget;
+use Amplify\Frontend\Abstracts\Widget;
 use Amplify\Wishlist\Widgets\Wishlist;
 use Amplify\Wishlist\Widgets\WishlistButton;
 use Illuminate\Support\ServiceProvider;

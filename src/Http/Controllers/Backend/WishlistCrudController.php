@@ -4,9 +4,7 @@ namespace Amplify\Wishlist\Http\Controllers\Backend;
 
 use Amplify\System\Abstracts\BackpackCustomCrudController;
 use Amplify\Wishlist\Http\Requests\WishlistRequest;
-
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class WishlistCrudController

@@ -6,7 +6,6 @@ use Amplify\System\Backend\Models\Contact;
 use Amplify\System\Backend\Models\Customer;
 use Amplify\System\Backend\Models\Product;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

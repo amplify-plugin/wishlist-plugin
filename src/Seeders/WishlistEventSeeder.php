@@ -3,9 +3,6 @@
 namespace Amplify\Wishlist\Seeders;
 
 use Amplify\System\Backend\Models\Event;
-use Amplify\System\Backend\Models\EventRecipent;
-use Amplify\System\Backend\Models\EventTemplate;
-use Amplify\System\Backend\Models\EventVariable;
 use Amplify\System\Traits\EventSeedTrait;
 use Illuminate\Database\Seeder;
 

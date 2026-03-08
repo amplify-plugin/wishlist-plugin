@@ -2,19 +2,12 @@
 
 namespace Amplify\Wishlist\Http\Controllers\Frontend;
 
-use Amplify\Frontend\Http\Requests\FavoriteListRequest;
-use Amplify\Frontend\Http\Requests\UpdateOrderListRequest;
 use Amplify\Frontend\Traits\HasDynamicPage;
-use Amplify\System\Backend\Models\OrderList;
-use Amplify\System\Backend\Models\OrderListItem;
 use Amplify\Wishlist\Http\Requests\WishlistNotificationRequest;
 use Amplify\Wishlist\Models\Wishlist;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Session;
 
 class WishlistController extends Controller
 {

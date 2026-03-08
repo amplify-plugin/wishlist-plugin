@@ -3,14 +3,11 @@
 namespace Amplify\Wishlist\Widgets;
 
 use Amplify\ErpApi\Facades\ErpApi;
+use Amplify\Frontend\Abstracts\BaseComponent;
 use Amplify\System\Backend\Enums\ProductAvailabilityEnum;
-use Amplify\System\Backend\Models\DocumentType;
 use Amplify\System\Backend\Models\OrderListItem;
 use Amplify\System\Backend\Models\Product;
-use Amplify\Widget\Abstracts\BaseComponent;
-use Illuminate\Database\Query\JoinClause;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Wishlist extends BaseComponent

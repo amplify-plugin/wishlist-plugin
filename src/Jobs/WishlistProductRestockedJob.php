@@ -2,9 +2,6 @@
 
 namespace Amplify\Wishlist\Jobs;
 
-use Amplify\System\Backend\Models\Contact;
-use Amplify\System\Backend\Models\Customer;
-use Amplify\System\Backend\Models\CustomerOrder;
 use Amplify\System\Backend\Models\Product;
 use Amplify\System\Backend\Traits\NotificationEventTrait;
 use Amplify\Wishlist\Models\Wishlist;
@@ -13,7 +10,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use function Adminer\where;
 
 class WishlistProductRestockedJob implements ShouldQueue
 {

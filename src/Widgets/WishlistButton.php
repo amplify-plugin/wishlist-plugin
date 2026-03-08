@@ -2,9 +2,9 @@
 
 namespace Amplify\Wishlist\Widgets;
 
+use Amplify\Frontend\Abstracts\BaseComponent;
 use Amplify\System\Backend\Models\Product;
 use Amplify\System\Sayt\Classes\ItemRow;
-use Amplify\Widget\Abstracts\BaseComponent;
 
 class WishlistButton extends BaseComponent
 {
