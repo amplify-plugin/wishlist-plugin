@@ -43,7 +43,10 @@ class WishlistProductRestockedJob implements ShouldQueue
             ->whereNotify(true)
             ->where(function ($query) {
                 return $query->whereNull('last_notified_at')
-                    ->orWhere('last_notified_at', '<=', now()->subDays('wishlist.notify_interval'));
+                    ->orWhere('last_notified_at',
+                        '<=',
+                        now()->subDays(config('wishlist.notify_interval'))
+                    );
             })
             ->get()
             ->each(function (Wishlist $wishlist) {
