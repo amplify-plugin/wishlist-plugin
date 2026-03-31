@@ -17,7 +17,7 @@ class WishlistEventSeeder extends Seeder
                 'name' => 'Wishlist Product Restocked',
                 'code' => Event::WISHLIST_PRODUCT_RESTOCKED,
                 'enabled' => true,
-                'description' => 'This event get triggered when program system received a wishlisted item is avaliable to order.',
+                'description' => 'This event get triggered when program system received a wishlisted item is available to order.',
                 'eventVariables' => [
                     ['name' => '__full_name__', 'value' => '', 'description' => 'Contact full name who add the item to their wishlist'],
                     ['name' => '__product_name__', 'value' => '', 'description' => 'Wishlisted item name '],
