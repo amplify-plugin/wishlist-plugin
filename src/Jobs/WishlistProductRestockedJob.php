@@ -35,26 +35,27 @@ class WishlistProductRestockedJob implements ShouldQueue
      */
     public function handle()
     {
-        $product = Product::whereProductCode($this->stockEntry['product_code'])->first();
-
         $this->getNecessaryItems();
 
-        Wishlist::whereProductId($product->id)
-            ->whereNotify(true)
-            ->where(function ($query) {
-                return $query->whereNull('last_notified_at')
-                    ->orWhere('last_notified_at',
-                        '<=',
-                        now()->subDays(config('wishlist.notify_interval'))
-                    );
-            })
-            ->get()
-            ->each(function (Wishlist $wishlist) {
-                foreach ($this->eventInfo->eventActions as $eventAction) {
-                    if ($eventAction->eventTemplate->notification_type == 'emailable') {
-                        $this->emailService->sendWishlistProductRestockedEmail($eventAction, $wishlist);
+        foreach (Product::whereProductCode($this->stockEntry['product_code'])->cursor() as $product) {
+
+            Wishlist::whereProductId($product->getKey())
+                ->whereNotify(true)
+                ->where(function ($query) {
+                    return $query->whereNull('last_notified_at')
+                        ->orWhere('last_notified_at',
+                            '<=',
+                            now()->subDays(config('wishlist.notify_interval'))
+                        );
+                })
+                ->get()
+                ->each(function (Wishlist $wishlist) {
+                    foreach ($this->eventInfo->eventActions as $eventAction) {
+                        if ($eventAction->eventTemplate->notification_type == 'emailable') {
+                            $this->emailService->sendWishlistProductRestockedEmail($eventAction, $wishlist);
+                        }
                     }
-                }
-            });
+                });
+        }
     }
 }
