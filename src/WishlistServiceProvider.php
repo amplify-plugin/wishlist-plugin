@@ -56,6 +56,12 @@ class WishlistServiceProvider extends ServiceProvider
             ];
 
             Config::set('amplify.cms.page_types', $types);
+
+            $sidebar = app('sidebar');
+
+            $sidebar->item('Wishlists')
+                ->icon('la la-heart-o')
+                ->url(backpack_url('wishlist'));
         });
     }
 }
