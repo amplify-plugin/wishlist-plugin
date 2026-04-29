@@ -62,6 +62,14 @@ class WishlistServiceProvider extends ServiceProvider
             $sidebar->item('Wishlists')
                 ->icon('la la-heart-o')
                 ->url(backpack_url('wishlist'));
+
+            $sidebar->group('Settings')
+                ->items(function ($settings) {
+                    $settings->item('Wishlist')
+                        ->icon('la la-heart-o')
+//                        ->can('wishlist.settings')
+                        ->url(backpack_url('wishlist-setting'));
+                });
         });
     }
 }

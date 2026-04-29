@@ -51,7 +51,7 @@ class WishlistCrudController extends BackpackCustomCrudController
                 'select_attribute' => 'display_name',
             ],
             backpack_url('contact/fetch/customer'),
-            function ($value) { // if the filter is active
+            function ($value) {
                 $this->crud->query->where('customer_id', $value);
             }
         );
@@ -71,13 +71,14 @@ class WishlistCrudController extends BackpackCustomCrudController
             }
         );
 
-        CRUD::column('id')->label('#');
-        CRUD::column('contact_id')->type('relationship')->label('Contact');
-        CRUD::column('product_id')->type('relationship')->label('Product');
-        CRUD::column('remove_from_cart')->type('boolean');
-        CRUD::column('last_notified_at')->type('datetime');
-        CRUD::column('created_at')->type('datetime');
-        CRUD::column('updated_at')->type('datetime');
+        CRUD::addColumns([
+            ['name' => 'contact_id', 'type' => 'relationship', 'label' => 'Contact', 'entity' => 'contact', 'attribute' => 'name'],
+            ['name' => 'product_id', 'type' => 'relationship', 'label' => 'Product Code', 'entity' => 'product', 'attribute' => 'product_code'],
+            ['name' => 'remove_from_cart', 'type' => 'boolean', 'label' => 'Remove From Cart?'],
+            ['name' => 'notify', 'type' => 'boolean', 'label' => 'Notify?'],
+            ['name' => 'last_notified_at', 'type' => 'datetime', 'label' => 'Last Notified At'],
+            ['name' => 'updated_at', 'type' => 'datetime', 'label' => 'Updated At'],
+        ]);
     }
 
     /**
@@ -123,6 +124,7 @@ class WishlistCrudController extends BackpackCustomCrudController
             'default' => old('product_id', $this->crud->entry->product_id ?? null),
         ]);
 
+        CRUD::field('notify')->type('boolean')->label('Notify when the item is restocked?');
         CRUD::field('remove_from_cart')->type('boolean')->label('Remove Item when added to cart?');
     }
 

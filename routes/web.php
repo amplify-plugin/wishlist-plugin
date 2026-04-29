@@ -11,6 +11,7 @@ Route::middleware(array_merge(config('backpack.base.web_middleware', ['web']),
     ->namespace('Amplify\Wishlist\Http\Controllers\Backend')
     ->group(function () {
         Route::crud('wishlist', 'WishlistCrudController');
+        Route::crud('wishlist-setting', 'WishlistSettingController');
     });
 
 //Frontend Routes
