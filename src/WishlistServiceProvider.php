@@ -60,6 +60,7 @@ class WishlistServiceProvider extends ServiceProvider
             $sidebar = app('sidebar');
 
             $sidebar->item('Wishlists')
+                ->can('wishlist.list')
                 ->icon('la la-heart-o')
                 ->url(backpack_url('wishlist'));
         });

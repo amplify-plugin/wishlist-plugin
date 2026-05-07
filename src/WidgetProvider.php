@@ -28,6 +28,7 @@ class WidgetProvider extends ServiceProvider
                 '@attributes' => [],
                 '@nestedItems' => [],
                 'description' => 'Allow customers to manage their wish list items',
+                'permissions' => ['wishlist.list']
             ],
             WishlistButton::class => [
                 'name' => 'wishlist-button',
@@ -42,6 +43,7 @@ class WidgetProvider extends ServiceProvider
                     ['name' => 'x-slot::remove-label'],
                 ],
                 'description' => 'Allow customer to add or remove item to wishlist',
+                'permissions' => ['wishlist.manage']
             ],
         ];
 
