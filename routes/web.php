@@ -14,21 +14,23 @@ Route::middleware(array_merge(config('backpack.base.web_middleware', ['web']),
     });
 
 //Frontend Routes
-Route::name('frontend.wishlist.')->middleware(['web', ProtectAgainstSpam::class, 'auth:customer'])->group(function () {
+Route::name('frontend.wishlist.')->middleware(['web', 'customers', 'frontend'])->group(function () {
     Route::get('wishlist', [WishlistController::class, 'index'])->name('index');
     Route::post('wishlist', [WishlistController::class, 'add'])->name('store');
 
     Route::delete('wishlist/{product_id}', [WishlistController::class, 'remove'])
         ->name('destroy')
-        ->where(['product_id' => '[0-9]+']);
+        ->whereNumber('product_id');
 
     Route::put('wishlist/{product_id}', [WishlistController::class, 'update'])
         ->name('update')
-        ->where(['product_id' => '[0-9]+']);
+        ->whereNumber('product_id');
 
     Route::post('wishlist/notification', [WishlistController::class, 'notification'])
         ->name('notification');
 
-    Route::get('wishlist/check/{product_id?}', [WishlistController::class, 'check'])->name('check');
+    Route::get('wishlist/check/{product_id?}', [WishlistController::class, 'check'])
+        ->name('check')
+        ->whereNumber('product_id');
 
 });
