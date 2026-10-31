@@ -21,7 +21,8 @@
 @pushonce('footer-script')
     <script>
         function syncWishlist(event, product_id) {
-            event.stopPropagation();    
+            event.stopPropagation();
+            event.preventDefault();
             if(!Amplify.authenticated()) {
                 Amplify.alert('You need to be logged in to access this feature.', 'Wishlist');
                 return;
@@ -73,13 +74,12 @@
                     var state = (response.data && response.data.id) ? 'true' : 'false';
                     button.data('state', state);
                     button.attr('data-state', state);
-                    button.attr("class").includes('outline') ? button.addClass('btn-outline-danger') : button.addClass('btn-danger');
+                    button.addClass('active');
                     button.append(removeTemplate);
                 } else {
                     button.data('state', 'false');
                     button.attr('data-state', 'false');
-                    button.removeClass('btn-danger btn-outline-danger');
-                    button.addClass('btn-' + variant);
+                    button.removeClass('active');
                     button.append(addTemplate);
                 }
             }, 'JSON');
@@ -88,7 +88,7 @@
 @endpushonce
 
 @if(customer_check())
-    @pushonce('footer-script')
+    @pushonce('footer-script', $product_id)
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 checkOnWishlist({{$product_id}});

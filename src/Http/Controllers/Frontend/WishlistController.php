@@ -128,8 +128,15 @@ class WishlistController extends Controller
         }
     }
 
-    public function check($product_id)
+    public function check(?int $product_id = null)
     {
+        if (empty($product_id)) {
+            return response()->json([
+                'exits' => false,
+                'data' => []
+            ]);
+        }
+
         $contact = customer(true);
 
         $wishlist = Wishlist::where('customer_id', $contact->customer_id)
