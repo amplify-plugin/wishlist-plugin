@@ -5,7 +5,7 @@
         data-state="false"
         data-toggle="tooltip"
         aria-label="Add to Wishlist"
-        onclick="syncWishlist({{$product_id}});"
+        onclick="syncWishlist(event, {{$product_id}});"
 >
     {{ $addLabel ?? '' }}
 </button>
@@ -20,7 +20,8 @@
 
 @pushonce('footer-script')
     <script>
-        function syncWishlist(product_id) {
+        function syncWishlist(event, product_id) {
+            event.stopPropagation();    
             if(!Amplify.authenticated()) {
                 Amplify.alert('You need to be logged in to access this feature.', 'Wishlist');
                 return;
